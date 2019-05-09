@@ -1,6 +1,7 @@
 package com.yet.spring.core;
 
 import com.yet.spring.core.beans.Client;
+import com.yet.spring.core.beans.Event;
 import com.yet.spring.core.loggers.ConsoleEventLogger;
 import com.yet.spring.core.loggers.EventLogger;
 import org.springframework.context.ApplicationContext;
@@ -14,12 +15,14 @@ public class App {
 
   public static void main(String[] args){
 
-    //@SuppressWarnings("resource") // We will remove this suppress in further lessons
     ApplicationContext ctx = new ClassPathXmlApplicationContext("spring.xml");
     App app = (App) ctx.getBean("app");
 
-    app.logEvent("Some event for 1");
-    app.logEvent("Some event for 2");
+    Event event = ctx.getBean(Event.class);
+    app.logEvent(event, "Some event for 1");
+
+    event = ctx.getBean(Event.class);
+    app.logEvent(event, "Some event for 2");
   }
 
   public App(Client client, EventLogger eventLogger) {
@@ -28,8 +31,9 @@ public class App {
     this.eventLogger = eventLogger;
   }
 
-  private void logEvent(String msg){
-    eventLogger.logEvent(msg.replaceAll(client.getId(), client.getFullName()));
+  private void logEvent(Event event, String msg){
+    event.setMsg(msg.replaceAll(client.getId(), client.getFullName()));
+    eventLogger.logEvent(event);
   }
 
 }
